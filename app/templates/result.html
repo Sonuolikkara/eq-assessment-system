@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results - EQ Assessment</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Your Results</h1>
+            <p>Emotional Intelligence Assessment Complete</p>
+        </header>
+        
+        <main>
+            <div class="result-container">
+                <!-- User Info Section -->
+                <div class="user-info">
+                    <p><strong>Name:</strong> {{ name }}</p>
+                    <p><strong>Profession:</strong> {{ profession }}</p>
+                </div>
+                
+                <!-- Main Score Section -->
+                <div class="score-box">
+                    <h2>Your EQ Score</h2>
+                    <div class="score-display" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                        <div style="font-size: 72pt; font-weight: bold; color: #667eea;">{{ eq_score }}</div>
+                        <div style="font-size: 24pt; color: #666;">/100</div>
+                    </div>
+                </div>
+                
+                <!-- Summary and Feedback -->
+                <div class="feedback-box">
+                    <h3>Assessment Summary</h3>
+                    <p><strong>{{ summary }}</strong></p>
+                    <p>{{ feedback }}</p>
+                    {% if recommendation %}
+                    <div style="background-color: #f0f7ff; padding: 15px; border-left: 4px solid #667eea; margin-top: 15px;">
+                        <strong>Recommendation:</strong> {{ recommendation }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Score Breakdown Component -->
+                {% if score_breakdown %}
+                <div class="breakdown-box">
+                    <h3>Score Breakdown by Component</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                        {% for component in score_breakdown.components %}
+                        <div style="background: linear-gradient(135deg, {{ component.color }} 0%, rgba(255,255,255,0.1) 100%); padding: 20px; border-radius: 10px; text-align: center;">
+                            <h4>{{ component.name }}</h4>
+                            <div style="font-size: 36pt; font-weight: bold; color: #333;">{{ component.score }}%</div>
+                            <p style="font-size: 12pt; color: #666;">Weight: {{ component.weight }}%</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Response Summary -->
+                {% if response_summary %}
+                <div class="response-breakdown">
+                    <h3>Detailed Response Analysis</h3>
+                    <div style="overflow-x: auto; margin-top: 15px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background-color: #f5f5f5; border-bottom: 2px solid #ddd;">
+                                    <th style="padding: 10px; text-align: left;">Q#</th>
+                                    <th style="padding: 10px; text-align: left;">Your Response</th>
+                                    <th style="padding: 10px; text-align: center;">Sentiment Score</th>
+                                    <th style="padding: 10px; text-align: center;">Emotional Quality</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for response in response_summary.responses %}
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 10px; font-weight: bold;">{{ response.question_number }}</td>
+                                    <td style="padding: 10px; max-width: 400px;">
+                                        <p style="margin: 0; color: #555;">{{ response.response_preview }}</p>
+                                    </td>
+                                    <td style="padding: 10px; text-align: center;">
+                                        <div style="background-color: #f0f0f0; padding: 8px; border-radius: 5px; font-weight: bold;">
+                                            {{ response.sentiment|floatformat:1 }}
+                                        </div>
+                                    </td>
+                                    <td style="padding: 10px; text-align: center;">
+                                        <span style="background-color: 
+                                            {% if response.sentiment > 0.6 %}#c6f6d5
+                                            {% elif response.sentiment > 0.4 %}#bee3f8
+                                            {% else %}#fed7d7
+                                            {% endif %};
+                                            padding: 5px 10px; border-radius: 5px;">
+                                            {{ response.sentiment_label }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Comparison Metrics -->
+                {% if comparison_metrics %}
+                <div class="comparison-box">
+                    <h3>Your Performance Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
+                            <p style="margin: 0; color: #666; font-size: 12pt;">Estimated Percentile</p>
+                            <div style="font-size: 28pt; font-weight: bold; color: #667eea;">{{ comparison_metrics.percentile }}th</div>
+                        </div>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
+                            <p style="margin: 0; color: #666; font-size: 12pt;">Score Range</p>
+                            <div style="font-size: 14pt; font-weight: bold; color: #333;">{{ comparison_metrics.range }}</div>
+                        </div>
+                        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
+                            <p style="margin: 0; color: #666; font-size: 12pt;">Sentiment Avg</p>
+                            <div style="font-size: 28pt; font-weight: bold; color: #667eea;">{{ sentiment_score }}<small style="font-size: 14pt;">%</small></div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Score Scale Interpretation -->
+                <div class="score-scale">
+                    <h3>EQ Score Interpretation Guide</h3>
+                    <ul>
+                        <li><strong>75-100:</strong> Excellent emotional intelligence - You demonstrate strong self-awareness, empathy, and interpersonal skills</li>
+                        <li><strong>60-74:</strong> Good emotional intelligence - You handle emotions well and show consideration for others</li>
+                        <li><strong>45-59:</strong> Average emotional intelligence - There's room to develop your emotional awareness and empathy</li>
+                        <li><strong>Below 45:</strong> Developmental area - Focus on building emotional awareness and communication skills</li>
+                    </ul>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div style="margin-top: 30px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'index' %}" class="btn" style="background-color: #667eea;">Take Assessment Again</a>
+                    <button onclick="window.print()" class="btn" style="background-color: #764ba2;">Print Results</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <style>
+        .result-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .score-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .feedback-box, .breakdown-box, .response-breakdown, .comparison-box, .score-scale {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .user-info {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            margin: 15px 0;
+        }
+        
+        @media print {
+            header, .btn, button {
+                display: none;
+            }
+        }
+    </style>
+</body>
+</html>

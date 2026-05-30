@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment - EQ System</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Assessment</h1>
+            <p>Respond thoughtfully to the following scenario and questions</p>
+        </header>
+        
+        <main>
+            {% if errors %}
+            <div class="error-message">
+                <h3>Please fix the following errors:</h3>
+                <ul>
+                    {% for error in errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="scenario-box">
+                <h2>Scenario:</h2>
+                <p>{{ scenario }}</p>
+            </div>
+            
+            <form method="POST" class="assessment-form">
+                {% csrf_token %}
+                
+                {% for question in questions %}
+                <div class="question-group">
+                    <label for="response_{{ forloop.counter }}">
+                        <strong>Q{{ forloop.counter }}:</strong> {{ question }}
+                    </label>
+                    <textarea id="response_{{ forloop.counter }}" name="response_{{ forloop.counter }}" rows="4" required></textarea>
+                    <small>Minimum 10 characters. Please provide thoughtful responses.</small>
+                </div>
+                {% endfor %}
+                
+                <button type="submit" class="btn">Submit Assessment</button>
+            </form>
+        </main>
+    </div>
+</body>
+</html>
